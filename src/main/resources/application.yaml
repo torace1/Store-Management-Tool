@@ -1,0 +1,18 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:mydb
+    username: sa
+    password: password
+    driverClassName: org.h2.Driver
+  h2:
+    console.enabled: true
+  jpa:
+    spring.jpa.database-platform: org.hibernate.dialect.H2Dialect
+
+springdoc:
+  api-docs:
+    path: /api-docs
+
+token:
+  signing:
+    key: "secrdasdasdasdasdas23423r2qf23rf23f23f23f23f23f2et"
