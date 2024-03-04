@@ -1,7 +1,7 @@
 package com.smt.project.config;
 
-import com.smt.project.repository.UserService;
 import com.smt.project.security.JwtService;
+import com.smt.project.service.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

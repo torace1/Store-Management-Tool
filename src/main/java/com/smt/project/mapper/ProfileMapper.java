@@ -6,9 +6,9 @@ import com.smt.project.model.Profile;
 public final class ProfileMapper {
     public static Profile profileDtoToProfile(ProfileDto profileDto) {
         Profile profile = new Profile();
-        profile.setFirstName(profileDto.getFirstName());
-        profile.setLastName(profileDto.getLastName());
-        profile.setAge(profileDto.getAge());
+        profile.setFirstName(profileDto.firstName());
+        profile.setLastName(profileDto.lastName());
+        profile.setAge(profileDto.age());
         return profile;
     }
 }

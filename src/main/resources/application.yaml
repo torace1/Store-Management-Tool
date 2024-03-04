@@ -15,4 +15,13 @@ springdoc:
 
 token:
   signing:
-    key: "secrdasdasdasdasdas23423r2qf23rf23f23f23f23f23f2et"
+    key: "$TOKEN_KEY"
+
+email:
+  sender: "$EMAIL_SENDER"
+  password: "$EMAIL_PASSWORD"
+
+
+server:
+  servlet:
+    context-path: "/smt"

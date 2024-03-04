@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.annotation.Secured;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,7 +16,7 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @RequestMapping("/profiles")
 @RestController
-public class  ProfileController {
+public class ProfileController {
     private final ProfileService profileService;
 
     @PostMapping("/send-order")
@@ -56,8 +55,8 @@ public class  ProfileController {
     }
 
     @GetMapping("/byEmail")
-    public ResponseEntity<Profile> getProfileWithIdentity(@RequestParam String email) {
-        return new ResponseEntity<>(profileService.getProfileWithIdentity(email), HttpStatus.OK);
+    public ResponseEntity<Profile> getProfileOfUser(@RequestParam String email) {
+        return new ResponseEntity<>(profileService.getProfileOfUser(email), HttpStatus.OK);
     }
 
     @GetMapping()

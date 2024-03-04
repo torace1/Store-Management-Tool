@@ -1,9 +1,9 @@
-package com.smt.project.service;
+package com.smt.project.service.impl;
 
 import com.smt.project.exception.SmtException;
 import com.smt.project.model.User;
 import com.smt.project.repository.UserRepository;
-import com.smt.project.repository.UserService;
+import com.smt.project.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,9 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new SmtException(404,"User not found"));
     }
 
-    public User getIdentityWithEmail(String email) {
+    public User getUserWithEmail(String email) {
         return userRepository.findByUsername(email)
                 .orElse(null);
     }
+
 }

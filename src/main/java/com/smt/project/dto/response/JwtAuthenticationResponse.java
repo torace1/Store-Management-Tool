@@ -1,4 +1,4 @@
-package com.smt.project.dto;
+package com.smt.project.dto.response;
 
 import lombok.Builder;
 import lombok.Data;

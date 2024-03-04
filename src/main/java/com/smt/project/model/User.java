@@ -23,6 +23,7 @@ public class User implements UserDetails {
     private String password;
     private boolean enabled;
 
+    private String validationCode;
     @OneToOne(cascade = CascadeType.ALL)
     @JsonManagedReference
     private Profile profile;
