@@ -7,6 +7,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 import java.util.UUID;
@@ -20,5 +21,6 @@ public class Category {
     private CategoryName name;
     @OneToMany
     @JsonManagedReference
+    @ToString.Exclude
     private List<Product> products;
 }

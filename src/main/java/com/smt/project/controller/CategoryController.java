@@ -40,4 +40,10 @@ public class CategoryController {
         categoryService.deleteCategory(categoryId);
         return  ResponseEntity.status(HttpStatus.OK).build();
     }
+
+    @GetMapping("/{categoryId}/carts")
+    @Secured("ADMIN")
+    public ResponseEntity<List<UUID>> getCarts(@PathVariable UUID categoryId) {
+        return  ResponseEntity.status(HttpStatus.OK).body(  categoryService.getCartIdsByCategoryId(categoryId));
+    }
 }

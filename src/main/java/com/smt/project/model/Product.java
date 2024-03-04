@@ -18,8 +18,8 @@ public class Product {
     @ManyToOne
     @JsonBackReference
     private Category category;
-    @ManyToMany
     @JsonBackReference
+    @ManyToMany
     private List<Cart> carts;
     @ManyToMany
     @JsonBackReference

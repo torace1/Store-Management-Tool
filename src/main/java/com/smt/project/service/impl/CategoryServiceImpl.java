@@ -2,21 +2,30 @@ package com.smt.project.service.impl;
 
 import com.smt.project.enums.CategoryName;
 import com.smt.project.exception.SmtException;
+import com.smt.project.model.Cart;
 import com.smt.project.model.Category;
+import com.smt.project.repository.CartRepository;
 import com.smt.project.repository.CategoryRepository;
+import com.smt.project.repository.ProductRepository;
 import com.smt.project.service.CategoryService;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
+    private final CartRepository cartRepository;
+
+    private final ProductRepository productRepository;
 
     @Override
     public Category createCategory(String categoryName) {
@@ -58,9 +67,25 @@ public class CategoryServiceImpl implements CategoryService {
         return categoryRepository.findAll();
     }
 
+
     @Override
+    public List<UUID> getCartIdsByCategoryId(UUID categoryId){
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+
+        return cartRepository.findByProductsCategory(category.getId()).stream().map(Cart::getId).collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
     public void deleteCategory(UUID categoryId) {
-        categoryRepository.delete(getCategoryById(categoryId));
+        Category category = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new EntityNotFoundException("Category not found"));
+        List<Cart> carts = cartRepository.findByProductsCategory(category.getId());
+        if (carts.size()!=0){
+            throw new SmtException(500, " There are carts with products from this category");
+        }
+        categoryRepository.delete(category);
         log.info(String.format("Category with id %s was deleted", categoryId));
     }
 }

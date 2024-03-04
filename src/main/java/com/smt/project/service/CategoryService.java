@@ -17,4 +17,6 @@ public interface CategoryService {
     List<Category> getAllCategories();
 
     void deleteCategory(UUID categoryId);
+
+     List<UUID> getCartIdsByCategoryId(UUID categoryId);
 }

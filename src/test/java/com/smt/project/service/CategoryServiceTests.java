@@ -3,7 +3,9 @@ package com.smt.project.service;
 
 import com.smt.project.enums.CategoryName;
 import com.smt.project.exception.SmtException;
+import com.smt.project.model.Cart;
 import com.smt.project.model.Category;
+import com.smt.project.repository.CartRepository;
 import com.smt.project.repository.CategoryRepository;
 import com.smt.project.service.impl.CategoryServiceImpl;
 import org.junit.jupiter.api.DisplayName;
@@ -29,13 +31,15 @@ public class CategoryServiceTests {
 
     @Mock
     private CategoryRepository categoryRepository;
+    @Mock
+    private CartRepository cartRepository;
     @InjectMocks
     private CategoryServiceImpl categoryService;
     @Captor
     private ArgumentCaptor<Category> categoryCaptor;
 
 
-    @DisplayName("JUnit test for createCategory method success")
+    @DisplayName("test for createCategory method success")
     @Test
     public void givenCategoryName_whenCreateCategory_thenNothing(){
         // given
@@ -55,7 +59,7 @@ public class CategoryServiceTests {
         assertEquals(expectedCategoryName, createdCategory.getName());
     }
 
-    @DisplayName("JUnit test for createCategory method fail, already existing category with this name")
+    @DisplayName("test for createCategory method fail, already existing category with this name")
     @Test
     public void givenExistingCategoryName_whenCreateCategory_thenExceptionThrown(){
         // given
@@ -70,7 +74,7 @@ public class CategoryServiceTests {
         });
     }
 
-    @DisplayName("JUnit test for createCategory method fail, invalid category name")
+    @DisplayName("test for createCategory method fail, invalid category name")
     @Test
     public void givenInvalidCategoryName_whenCreateCategory_thenExceptionThrown(){
         // given
@@ -82,7 +86,7 @@ public class CategoryServiceTests {
         });
     }
 
-    @DisplayName("JUnit test for getCategoryByName method success")
+    @DisplayName("test for getCategoryByName method success")
     @Test
     public void givenExistingCategoryName_whenGetCategoryByName_thenCategoryReturned(){
         // given
@@ -98,7 +102,7 @@ public class CategoryServiceTests {
         assertEquals(category, expectedCategory);
     }
 
-    @DisplayName("JUnit test for getCategoryByName method with non-existing category")
+    @DisplayName("test for getCategoryByName method with non-existing category")
     @Test
     public void givenNonExistingCategoryName_whenGetCategoryByName_thenExceptionThrown(){
         // given
@@ -109,7 +113,7 @@ public class CategoryServiceTests {
         assertThrows(SmtException.class, () -> categoryService.getCategoryByName(categoryName));
     }
 
-    @DisplayName("JUnit test for getCategoryById method success")
+    @DisplayName("test for getCategoryById method success")
     @Test
     public void givenExistingCategoryId_whenGetCategoryById_thenCategoryReturned(){
         // given
@@ -125,7 +129,7 @@ public class CategoryServiceTests {
         assertEquals(category, expectedCategory);
     }
 
-    @DisplayName("JUnit test for getCategoryById method with non-existing category")
+    @DisplayName("test for getCategoryById method with non-existing category")
     @Test
     public void givenNonExistingCategoryId_whenGetCategoryById_thenExceptionThrown(){
         // given
@@ -136,7 +140,7 @@ public class CategoryServiceTests {
         assertThrows(SmtException.class, () -> categoryService.getCategoryById(categoryId));
     }
 
-    @DisplayName("JUnit test for getAllCategories method success")
+    @DisplayName("test for getAllCategories method success")
     @Test
     public void whenGetAllCategories_thenListReturned(){
         // given
@@ -154,20 +158,66 @@ public class CategoryServiceTests {
         assertTrue(categories.containsAll(expectedCategories));
     }
 
-    @DisplayName("JUnit test for deleteCategory method success")
     @Test
-    public void givenCategoryId_whenDeleteCategory_thenCategoryDeleted(){
+    @DisplayName("Test getCartIdsByCategoryId method success")
+    void whenGetAllCartsByCategory_thenListReturned() {
         // given
         UUID categoryId = UUID.randomUUID();
-        Category expectedCategory = new Category();
-        expectedCategory.setId(categoryId);
-        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expectedCategory));
+        Category category = new Category();
+        category.setId(categoryId);
+        Cart cart1 = new Cart();
+        cart1.setId(UUID.randomUUID());
+        Cart cart2 = new Cart();
+        cart2.setId(UUID.randomUUID());
+        List<Cart> carts = Arrays.asList(cart1, cart2);
+
+        // stubbing repository methods
+        when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(category));
+        when(cartRepository.findByProductsCategory(categoryId)).thenReturn(carts);
 
         // when
+        List<UUID> cartIds = categoryService.getCartIdsByCategoryId(categoryId);
+
+        // then
+        assertEquals(2, cartIds.size());
+        assertTrue(cartIds.contains(cart1.getId()));
+        assertTrue(cartIds.contains(cart2.getId()));
+    }
+
+    @Test
+    @DisplayName("Test deleteCategory method success")
+    void givenProductsAndCarts_whenDeleteCategory_thenCheckException() {
+        // given
+        UUID categoryId = UUID.randomUUID();
+        Category category = new Category();
+        category.setId(categoryId);
+        Cart cart1 = new Cart();
+        cart1.setId(UUID.randomUUID());
+        Cart cart2 = new Cart();
+        cart2.setId(UUID.randomUUID());
+        List<Cart> carts = Arrays.asList(cart1, cart2);
+        when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(category));
+        when(cartRepository.findByProductsCategory(categoryId)).thenReturn(carts);
+
+        // then
+        assertThrows(SmtException.class, () -> categoryService.deleteCategory(categoryId));
+    }
+
+    @Test
+    @DisplayName("Test deleteCategory method success")
+    void givenProductsAndCarts_whenDeleteCategory_thenDelete() {
+        // given
+        UUID categoryId = UUID.randomUUID();
+        Category category = new Category();
+        category.setId(categoryId);
+
+        // when
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         categoryService.deleteCategory(categoryId);
 
         // then
-        verify(categoryRepository, times(1)).delete(categoryCaptor.capture());
-        assertEquals(expectedCategory, categoryCaptor.getValue());
+        verify(cartRepository).findByProductsCategory(categoryId);
+        verify(cartRepository, times(0)).deleteById(any());
+        verify(categoryRepository).delete(category);
     }
 }
