@@ -69,7 +69,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     @Override
     public void enableUser(String validationCode) {
         User user = userRepository.findByValidationCode(validationCode)
-                .orElseThrow(() -> new SmtException(404, "User with this validationCode was not found"));
+                .orElseThrow(() -> new SmtException(404, "User with this validationCode was not found "));
         if(user.isEnabled()){
             throw new SmtException(500, ("This code was already used"));
         }

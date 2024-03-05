@@ -1,8 +1,8 @@
 spring:
   datasource:
-    url: jdbc:h2:mem:mydb
-    username: sa
-    password: password
+    url: ${DB_HOST}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driverClassName: org.h2.Driver
   h2:
     console.enabled: true
@@ -15,11 +15,11 @@ springdoc:
 
 token:
   signing:
-    key: "$TOKEN_KEY"
+    key: ${KEY}
 
 email:
-  sender: "$EMAIL_SENDER"
-  password: "$EMAIL_PASSWORD"
+  sender:  ${EMAIL_SENDER}
+  password: ${EMAIL_PASSWORD}
 
 
 server:

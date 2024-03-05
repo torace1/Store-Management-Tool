@@ -1,5 +1,6 @@
 package com.smt.project.controller;
 
+import com.smt.project.audit.AuditLogging;
 import com.smt.project.dto.ProductDto;
 import com.smt.project.model.Product;
 import com.smt.project.service.ProductService;
@@ -20,6 +21,7 @@ public class ProductController {
 
     @PostMapping
     @Secured("ADMIN")
+    @AuditLogging
     public ResponseEntity<Void> createProduct(@RequestBody ProductDto productDto) {
         productService.createProduct(productDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
@@ -37,8 +39,16 @@ public class ProductController {
 
     @DeleteMapping("/{productId}")
     @Secured("ADMIN")
+    @AuditLogging
     public ResponseEntity<Void> deleteProduct(@PathVariable UUID productId) {
         productService.deleteProduct(productId);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/{productId}/carts")
+    @Secured("ADMIN")
+    @AuditLogging
+    public ResponseEntity<List<UUID>> getTheCartsAssociatedWithProductId(@PathVariable UUID productId) {
+        return  ResponseEntity.status(HttpStatus.OK).body(productService.checkThePresenceOfTheProdcutsInCarts(productId));
     }
 }

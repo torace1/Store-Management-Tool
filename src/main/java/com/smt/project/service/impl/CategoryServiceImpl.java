@@ -6,7 +6,6 @@ import com.smt.project.model.Cart;
 import com.smt.project.model.Category;
 import com.smt.project.repository.CartRepository;
 import com.smt.project.repository.CategoryRepository;
-import com.smt.project.repository.ProductRepository;
 import com.smt.project.service.CategoryService;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -24,8 +23,6 @@ import java.util.stream.Collectors;
 public class CategoryServiceImpl implements CategoryService {
     private final CategoryRepository categoryRepository;
     private final CartRepository cartRepository;
-
-    private final ProductRepository productRepository;
 
     @Override
     public Category createCategory(String categoryName) {

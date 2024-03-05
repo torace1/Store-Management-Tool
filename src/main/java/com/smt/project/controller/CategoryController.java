@@ -1,5 +1,6 @@
 package com.smt.project.controller;
 
+import com.smt.project.audit.AuditLogging;
 import com.smt.project.model.Category;
 import com.smt.project.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +20,7 @@ public class CategoryController {
 
     @PostMapping
     @Secured("ADMIN")
+    @AuditLogging
     public ResponseEntity<Void> createCategory(@RequestParam String categoryName) {
         categoryService.createCategory(categoryName);
         return  ResponseEntity.status(HttpStatus.CREATED).build();
@@ -36,6 +38,7 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     @Secured("ADMIN")
+    @AuditLogging
     public ResponseEntity<Void> deleteCategory(@PathVariable UUID categoryId) {
         categoryService.deleteCategory(categoryId);
         return  ResponseEntity.status(HttpStatus.OK).build();
@@ -43,6 +46,7 @@ public class CategoryController {
 
     @GetMapping("/{categoryId}/carts")
     @Secured("ADMIN")
+    @AuditLogging
     public ResponseEntity<List<UUID>> getCarts(@PathVariable UUID categoryId) {
         return  ResponseEntity.status(HttpStatus.OK).body(  categoryService.getCartIdsByCategoryId(categoryId));
     }

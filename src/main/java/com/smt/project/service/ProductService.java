@@ -12,4 +12,6 @@ public interface ProductService {
      Product getProductById(UUID productId);
      void deleteProduct(UUID productId);
      List<Product> getAllProducts();
+     public void updateProductStock(Product product);
+     public List<UUID> checkThePresenceOfTheProdcutsInCarts(UUID productid);
 }

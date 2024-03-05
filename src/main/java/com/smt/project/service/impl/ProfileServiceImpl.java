@@ -5,16 +5,17 @@ import com.smt.project.exception.SmtException;
 import com.smt.project.mapper.ProfileMapper;
 import com.smt.project.model.*;
 import com.smt.project.repository.ProfileRepository;
+import com.smt.project.security.JwtService;
 import com.smt.project.service.ProductService;
 import com.smt.project.service.ProfileService;
 import com.smt.project.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -23,12 +24,15 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileRepository profileRepository;
     private final UserService userService;
     private final ProductService productService;
+    private final JwtService jwtService;
 
     @Override
-    public void sendOrder(String email) {
+    public void sendOrder(HttpServletRequest request) {
+        String email = jwtService.extractUsernameFromRequest(request);
         Profile profile = getProfileOfUser(email);
         Cart cart = profile.getShoppingCart();
         List<Product> products = cart.getProducts();
+        List<Product> restOfStock = getNewProductsStock(products);
         List<Order> orders = profile.getOrders();
         Order order = new Order(cart.getPriceSum(), profile, products);
         orders.add(order);
@@ -37,12 +41,39 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setShoppingCart(cart);
         profile.setOrders(orders);
         profileRepository.save(profile);
+        restOfStock.forEach(productService::updateProductStock);
         log.info(String.format("order with id :: %s was sent", order.getId()));
     }
 
+    private List<Product> getNewProductsStock(List<Product> products) {
+        Map<UUID, Integer> numberOfOccurrencesProducts = getNumberOfOccurrenceProducts(products);
+        List<Product> restOfStock = new ArrayList<>();
+        numberOfOccurrencesProducts.forEach((key, value) -> {
+            Product product = productService.getProductById(key);
+            if (product.getStock() < value) {
+                throw new SmtException(400, "Not enough stock");
+            } else {
+                int newStock = product.getStock() - value;
+                product.setStock(newStock);
+                restOfStock.add(product);
+            }
+        });
+        return restOfStock;
+    }
+
+    private Map<UUID, Integer> getNumberOfOccurrenceProducts(List<Product> products) {
+
+        return products.stream()
+                .collect(Collectors.toMap(Product::getId, p -> 1, Integer::sum));
+    }
+
     @Override
-    public void addProductToCart(UUID productId, String email) {
+    public void addProductToCart(UUID productId, int noOfPieces, HttpServletRequest request) {
+        String email = jwtService.extractUsernameFromRequest(request);
         Product product = productService.getProductById(productId);
+        if (product.getStock() < noOfPieces) {
+            throw new SmtException(400, " Not enough stock");
+        }
         Profile profile = getProfileOfUser(email);
         Cart cart = profile.getShoppingCart();
         List<Product> products = cart.getProducts();
@@ -54,7 +85,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void removeProductFromCart(UUID productId, String email) {
+    public void removeProductFromCart(UUID productId, HttpServletRequest request) {
+        String email = jwtService.extractUsernameFromRequest(request);
         Product product = productService.getProductById(productId);
         Profile profile = getProfileOfUser(email);
         Cart cart = profile.getShoppingCart();
@@ -67,7 +99,8 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void removeAllProductsFromCart(String email) {
+    public void removeAllProductsFromCart(HttpServletRequest request) {
+        String email = jwtService.extractUsernameFromRequest(request);
         Profile profile = getProfileOfUser(email);
         Cart cart = profile.getShoppingCart();
         cart.setProducts(Collections.emptyList());
@@ -78,13 +111,13 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void createProfile(ProfileDto profileDto) {
-        if (userService.getUserWithEmail(profileDto.email()) != null) {
-            throw new SmtException(400, String.format("Profile with email {%s} already exists", profileDto.email()));
+    public void createProfile(HttpServletRequest request, ProfileDto profileDto) {
+        String email = jwtService.extractUsernameFromRequest(request);
+        if (getProfileOfUser(email) != null) {
+            throw new SmtException(400, String.format("Profile with email {%s} already exists", email));
         }
         Profile profile = ProfileMapper.profileDtoToProfile(profileDto);
-        User user = new User();
-        user.setUsername(profileDto.email());
+        User user = userService.getUserWithEmail(email);
         Cart shoppingCart = new Cart();
         shoppingCart.setPriceSum(0.0);
         user.setProfile(profile);
@@ -118,7 +151,9 @@ public class ProfileServiceImpl implements ProfileService {
     }
 
     @Override
-    public void deleteProfile(String email) {
+    public void deleteProfile(HttpServletRequest request) {
+
+        String email = jwtService.extractUsernameFromRequest(request);
         profileRepository.delete(getProfileOfUser(email));
     }
 }

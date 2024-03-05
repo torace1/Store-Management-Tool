@@ -28,6 +28,9 @@ public class User implements UserDetails {
     @JsonManagedReference
     private Profile profile;
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Audit> audits;
+
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }

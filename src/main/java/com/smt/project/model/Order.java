@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,6 +12,7 @@ import java.util.UUID;
 @Data
 @Table(name = "orders")
 @Entity
+@NoArgsConstructor
 public class Order {
     @Id
     @GeneratedValue
@@ -19,7 +21,7 @@ public class Order {
     @ManyToOne
     @JsonBackReference
     private Profile profile;
-    @ManyToMany
+    @ManyToMany(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
     @JsonManagedReference
     private List<Product> products;
 

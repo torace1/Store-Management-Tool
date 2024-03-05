@@ -4,6 +4,7 @@ package com.smt.project.controller;
 import com.smt.project.dto.ProfileDto;
 import com.smt.project.model.Profile;
 import com.smt.project.service.ProfileService;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,36 +22,36 @@ public class ProfileController {
 
     @PostMapping("/send-order")
     @Secured("USER")
-    public ResponseEntity<Void> sendOrder(@RequestParam String email) {
-        profileService.sendOrder(email);
+    public ResponseEntity<Void> sendOrder(HttpServletRequest request) {
+        profileService.sendOrder(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("/add-product/{productId}")
     @Secured("USER")
-    public ResponseEntity<Void> addProductToCart(@PathVariable UUID productId, @RequestParam String email) {
-        profileService.addProductToCart(productId, email);
+    public ResponseEntity<Void> addProductToCart(@PathVariable UUID productId, @RequestParam int noOfPieces, HttpServletRequest request) {
+        profileService.addProductToCart(productId,noOfPieces, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/remove-product/{productId}")
     @Secured("USER")
-    public ResponseEntity<Void> removeProductFromCart(@PathVariable UUID productId, @RequestParam String email) {
-        profileService.removeProductFromCart(productId, email);
+    public ResponseEntity<Void> removeProductFromCart(@PathVariable UUID productId, HttpServletRequest request) {
+        profileService.removeProductFromCart(productId, request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @DeleteMapping("/remove-all-products")
     @Secured("USER")
-    public ResponseEntity<Void> removeAllProductsFromCart(@RequestParam String email) {
-        profileService.removeAllProductsFromCart(email);
+    public ResponseEntity<Void> removeAllProductsFromCart(HttpServletRequest request) {
+        profileService.removeAllProductsFromCart(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping
     @Secured("USER")
-    public ResponseEntity<Void> createProfile(@RequestBody ProfileDto profileDto) {
-        profileService.createProfile(profileDto);
+    public ResponseEntity<Void> createProfile(@RequestBody ProfileDto profileDto,HttpServletRequest request) {
+        profileService.createProfile(request,profileDto);
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -74,8 +75,8 @@ public class ProfileController {
 
     @DeleteMapping
     @Secured("USER")
-    public ResponseEntity<Void> deleteProfile(@RequestParam String email) {
-        profileService.deleteProfile(email);
+    public ResponseEntity<Void> deleteProfile(HttpServletRequest request) {
+        profileService.deleteProfile(request);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

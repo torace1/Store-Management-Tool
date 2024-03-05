@@ -8,6 +8,7 @@ public final class ProductMapper {
         Product product = new Product();
         product.setName(productDto.name());
         product.setPrice(productDto.price());
+        product.setStock(productDto.stock());
         return product;
     }
 }

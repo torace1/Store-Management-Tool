@@ -2,20 +2,21 @@ package com.smt.project.service;
 
 import com.smt.project.dto.ProfileDto;
 import com.smt.project.model.Profile;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ProfileService {
-     void sendOrder(String email);
+     void sendOrder(HttpServletRequest request);
 
-    void addProductToCart(UUID productId, String email);
+    void addProductToCart(UUID productId,int noOfPieces, HttpServletRequest request);
 
-     void removeProductFromCart(UUID productId, String email);
+     void removeProductFromCart(UUID productId, HttpServletRequest request);
 
-     void removeAllProductsFromCart(String email);
+     void removeAllProductsFromCart(HttpServletRequest request);
 
-     void createProfile(ProfileDto profileDto);
+     void createProfile(HttpServletRequest request,ProfileDto profileDto);
 
      Profile getProfileOfUser(String email);
 
@@ -23,6 +24,6 @@ public interface ProfileService {
 
      void updateProfile(ProfileDto profileDto);
 
-     void deleteProfile(String email);
+     void deleteProfile(HttpServletRequest request);
 
 }
