@@ -170,8 +170,6 @@ public class CategoryServiceTests {
         Cart cart2 = new Cart();
         cart2.setId(UUID.randomUUID());
         List<Cart> carts = Arrays.asList(cart1, cart2);
-
-        // stubbing repository methods
         when(categoryRepository.findById(categoryId)).thenReturn(java.util.Optional.of(category));
         when(cartRepository.findByProductsCategory(categoryId)).thenReturn(carts);
 
